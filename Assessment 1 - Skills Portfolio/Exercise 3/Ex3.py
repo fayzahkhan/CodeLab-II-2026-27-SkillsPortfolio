@@ -1,4 +1,3 @@
-
 import tkinter as tk
 import os
 from PIL import Image, ImageTk
@@ -157,6 +156,11 @@ win_w, win_h = 960, 540
 root.geometry(f"{win_w}x{win_h}")
 root.resizable(False, False)
 root.configure(bg="#FFD6E7")
+
+cut_path = os.path.join(os.path.dirname(__file__), "cut.png")
+cut_pil = Image.open(cut_path).resize((32, 32), Image.Resampling.LANCZOS)
+cut_icon = ImageTk.PhotoImage(cut_pil)
+root.iconphoto(True, cut_icon)
 
 bg_path = os.path.join(os.path.dirname(__file__), "m.png")
 bg_image = Image.open(bg_path).resize((win_w, win_h), Image.Resampling.LANCZOS)

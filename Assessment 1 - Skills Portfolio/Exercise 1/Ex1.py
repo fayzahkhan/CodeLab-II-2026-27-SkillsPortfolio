@@ -1,8 +1,7 @@
-
-
 import tkinter as tk
 import random
 from pathlib import Path
+from PIL import Image, ImageTk
 
 
 def displayMenu():
@@ -169,13 +168,18 @@ base_dir = Path(__file__).resolve().parent
 icon_path = base_dir / "calculator.ico"
 if icon_path.exists():
     try:
-        root.iconbitmap(str(icon_path))
-    except tk.TclError:
-        icon_img = tk.PhotoImage(file=str(base_dir / "p.png"))
-        root.iconphoto(False, icon_img)
+        ico_pil = Image.open(icon_path).resize((32, 32), Image.Resampling.LANCZOS)
+        icon_img = ImageTk.PhotoImage(ico_pil)
+        root.iconphoto(True, icon_img)
+    except Exception:
+        try:
+            root.iconbitmap(str(icon_path))
+        except tk.TclError:
+            pass
 else:
-    icon_img = tk.PhotoImage(file=str(base_dir / "p.png"))
-    root.iconphoto(False, icon_img)
+    bg_icon_pil = Image.open(base_dir / "p.png").resize((32, 32), Image.Resampling.LANCZOS)
+    icon_img = ImageTk.PhotoImage(bg_icon_pil)
+    root.iconphoto(True, icon_img)
 
 #Background image! (Ai used in this section, I couldn't figure out why the image won't show up with the previos method.)
 image_path = base_dir / "p.png"
