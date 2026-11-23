@@ -2,6 +2,7 @@
 
 import tkinter as tk
 import random
+from pathlib import Path
 
 
 def displayMenu():
@@ -13,6 +14,7 @@ def displayMenu():
 def randomInt(difficulty):
     if difficulty == "Easy":
         return random.randint(0, 9)
+    
     elif difficulty == "Moderate":
         return random.randint(10, 99)
     else:
@@ -162,10 +164,22 @@ root.geometry("500x520")
 root.resizable(False, False)
 root.configure(bg="#FFF0F3")
 
-#Background image! (Ai used in this section, I couldn't figure out why the image won't show up with the previos method.)
-from pathlib import Path
+base_dir = Path(__file__).resolve().parent
 
-image_path = Path(__file__).resolve().parent / "p.png"
+#Logo!
+icon_path = base_dir / "calculator.ico"
+if icon_path.exists():
+    try:
+        root.iconbitmap(str(icon_path))
+    except tk.TclError:
+        icon_img = tk.PhotoImage(file=str(base_dir / "p.png"))
+        root.iconphoto(False, icon_img)
+else:
+    icon_img = tk.PhotoImage(file=str(base_dir / "p.png"))
+    root.iconphoto(False, icon_img)
+
+#Background image! (Ai used in this section, I couldn't figure out why the image won't show up with the previos method.)
+image_path = base_dir / "p.png"
 
 print(image_path)
 print(image_path.exists())

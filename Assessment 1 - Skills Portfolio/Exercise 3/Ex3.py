@@ -114,7 +114,7 @@ def viewIndividual():
     if not found:
         output.insert(tk.END, "Student not found!")
 
-#This eill find the student with the highest overall mark!
+#This will find the student with the highest overall mark!
 def highestStudent():
     output.delete("1.0", tk.END)
 

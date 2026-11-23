@@ -5,7 +5,7 @@ import random
 jokes = []
 current_punchline = ""
 
-#Reads jokes from the text file!
+#Reads jokes from the text file! (Ai used in this part, couldn't figure out why the jokes won't show up with the previous method.)
 import os
 
 def loadJokes():
