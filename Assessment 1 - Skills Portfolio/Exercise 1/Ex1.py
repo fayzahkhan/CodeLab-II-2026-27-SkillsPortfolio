@@ -340,6 +340,21 @@ feedback_label = tk.Label(
 )
 feedback_label.pack(pady=15)
 
+#back to menu button!
+quit_button = tk.Button(
+    quiz_frame,
+    text="Quit",
+    width=20,
+    font=("Arial", 11, "bold"),
+    bg="#FADADD",
+    fg="#713F4A",
+    activebackground="#F4ACB7",
+    relief="flat",
+    cursor="hand2",
+    command=displayMenu
+)
+quit_button.pack(pady=5)
+
 
 #Results screen
 result_frame = tk.Frame(root, bg="#FFFFFF", padx=40, pady=30)
