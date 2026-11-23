@@ -2,6 +2,7 @@ import tkinter as tk
 import random
 from pathlib import Path
 import os
+from PIL import Image, ImageTk
 
 jokes = []
 current_punchline = ""
@@ -73,6 +74,12 @@ background_image = tk.PhotoImage(file=str(image_path))
 background_label = tk.Label(root, image=background_image)
 background_label.place(x=0, y=0, relwidth=1, relheight=1)
 background_label.lower()
+
+#Cat title-bar icon!
+cat_path = folder_path / "cat.png"
+cat_pil = Image.open(cat_path).resize((32, 32), Image.Resampling.LANCZOS)
+cat_icon = ImageTk.PhotoImage(cat_pil)
+root.iconphoto(True, cat_icon)
 
 #Reads the joke file!
 try:
@@ -173,7 +180,6 @@ quit_button = tk.Button(
     command=root.destroy
 )
 quit_button.pack(pady=12)
-
 
 
 root.mainloop()

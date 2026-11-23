@@ -1,6 +1,7 @@
 
 import tkinter as tk
 import os
+from PIL import Image, ImageTk
 
 students = []
 
@@ -152,51 +153,86 @@ def lowestStudent():
 #This will create the main application window!
 root = tk.Tk()
 root.title("Student Manager")
-root.geometry("650x650")
-root.configure(bg="#FFF0F3")
+win_w, win_h = 960, 540
+root.geometry(f"{win_w}x{win_h}")
+root.resizable(False, False)
+root.configure(bg="#FFD6E7")
+
+bg_path = os.path.join(os.path.dirname(__file__), "m.png")
+bg_image = Image.open(bg_path).resize((win_w, win_h), Image.Resampling.LANCZOS)
+bg_photo = ImageTk.PhotoImage(bg_image)
+
+canvas = tk.Canvas(root, width=win_w, height=win_h, highlightthickness=0, bd=0)
+canvas.pack(fill="both", expand=True)
+canvas.create_image(0, 0, anchor="nw", image=bg_photo)
+
+controls_frame = tk.Frame(root, bg="#FCE4EC")
+controls_frame.place(x=675, y=68, width=240, height=320)
 
 title_label = tk.Label(
-    root,
+    controls_frame,
     text="Student Manager",
-    font=("Arial", 24, "bold"),
-    bg="#FFF0F3",
+    font=("Arial", 16, "bold"),
+    bg="#FCE4EC",
     fg="#C76D7E"
 )
-title_label.pack(pady=15)
+title_label.pack(pady=(6, 4))
 
 search_label = tk.Label(
-    root,
+    controls_frame,
     text="Enter student name or number:",
-    font=("Arial", 12),
-    bg="#FFF0F3"
+    font=("Arial", 9),
+    bg="#FCE4EC",
+    fg="#8E4A59"
 )
 search_label.pack()
 
-search_entry = tk.Entry(root, font=("Arial", 12), width=30)
-search_entry.pack(pady=8)
+search_entry = tk.Entry(controls_frame, font=("Arial", 10), width=22, bg="#FFFFFF", fg="#333333")
+search_entry.pack(pady=(3, 8))
 
 #Creates the menu buttons!
 button_style = {
-    "font": ("Arial", 11),
-    "bg": "#F4ACB7",
-    "width": 30
+    "font": ("Arial", 9, "bold"),
+    "bg": "#FFFFFF",
+    "fg": "#C76D7E",
+    "activebackground": "#FFF5F8",
+    "activeforeground": "#A85062",
+    "relief": "flat",
+    "bd": 1,
+    "width": 24
 }
 
-tk.Button(root, text="View All Student Records",
-          command=viewAll, **button_style).pack(pady=5)
+tk.Button(controls_frame, text="View All Student Records",
+          command=viewAll, **button_style).pack(pady=3)
 
-tk.Button(root, text="View Individual Student",
-          command=viewIndividual, **button_style).pack(pady=5)
+tk.Button(controls_frame, text="View Individual Student",
+          command=viewIndividual, **button_style).pack(pady=3)
 
-tk.Button(root, text="Highest Overall Mark",
-          command=highestStudent, **button_style).pack(pady=5)
+tk.Button(controls_frame, text="Highest Overall Mark",
+          command=highestStudent, **button_style).pack(pady=3)
 
-tk.Button(root, text="Lowest Overall Mark",
-          command=lowestStudent, **button_style).pack(pady=5)
+tk.Button(controls_frame, text="Lowest Overall Mark",
+          command=lowestStudent, **button_style).pack(pady=3)
 
 #This displays the results!
-output = tk.Text(root, height=18, width=65, font=("Arial", 10))
-output.pack(pady=15)
+output_frame = tk.Frame(root, bg="#FFFFFF")
+output_frame.place(x=62, y=80, width=545, height=375)
+
+scrollbar = tk.Scrollbar(output_frame)
+scrollbar.pack(side="right", fill="y")
+
+output = tk.Text(
+    output_frame,
+    font=("Arial", 10),
+    bg="#FFFFFF",
+    fg="#333333",
+    relief="flat",
+    bd=0,
+    wrap="word",
+    yscrollcommand=scrollbar.set
+)
+output.pack(side="left", fill="both", expand=True)
+scrollbar.config(command=output.yview)
 
 loadStudents()
 
