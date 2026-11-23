@@ -155,8 +155,7 @@ def displayResults():
 
 def playAgain():
     displayMenu()
-
-
+        
 #Main window!
 root = tk.Tk()
 root.title("Fay's Arithmetic Quiz")
@@ -189,7 +188,6 @@ background_image = tk.PhotoImage(file=str(image_path))
 background_label = tk.Label(root, image=background_image)
 background_label.place(x=0, y=0, relwidth=1, relheight=1)
 background_label.lower()
-
 
 score = 0
 question_count = 0
@@ -396,7 +394,5 @@ exit_button = tk.Button(
 )
 exit_button.pack(pady=5)
 
-
 displayMenu()
-
 root.mainloop()
