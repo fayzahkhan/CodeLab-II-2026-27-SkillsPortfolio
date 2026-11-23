@@ -1,12 +1,12 @@
-
 import tkinter as tk
 import random
+from pathlib import Path
+import os
 
 jokes = []
 current_punchline = ""
 
 #Reads jokes from the text file! (Ai used in this part, couldn't figure out why the jokes won't show up with the previous method.)
-import os
 
 def loadJokes():
     global jokes
@@ -56,9 +56,23 @@ def nextJoke():
 #Main window!
 root = tk.Tk()
 root.title("Alexa Tell Me a Joke")
-root.geometry("500x400")
+root.geometry("735x493")
 root.resizable(False, False)
 root.configure(bg="#FFF0F3")
+
+#Background image!
+folder_path = Path(__file__).resolve().parent
+
+image_path = folder_path / "l.png"
+
+print("Image path:", image_path)
+print("Image exists:", image_path.exists())
+
+background_image = tk.PhotoImage(file=str(image_path))
+
+background_label = tk.Label(root, image=background_image)
+background_label.place(x=0, y=0, relwidth=1, relheight=1)
+background_label.lower()
 
 #Reads the joke file!
 try:
@@ -159,5 +173,7 @@ quit_button = tk.Button(
     command=root.destroy
 )
 quit_button.pack(pady=12)
+
+
 
 root.mainloop()
