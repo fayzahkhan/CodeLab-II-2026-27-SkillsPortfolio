@@ -1,12 +1,14 @@
 import tkinter as tk
+from tkinter import messagebox
 import os
 from PIL import Image, ImageTk
 
 students = []
+header_line = None
 
 #this will read student information from the text file!
 def loadStudents():
-    global students
+    global students, header_line
 
     file_path = os.path.join(os.path.dirname(__file__), "studentMarks.txt")
 
@@ -15,6 +17,7 @@ def loadStudents():
         lines = file.readlines()
         file.close()
 
+        header_line = lines[0] if lines else None
         students = []
 
         for line in lines[1:]:
@@ -38,6 +41,25 @@ def loadStudents():
     except FileNotFoundError:
         output.delete("1.0", tk.END)
         output.insert(tk.END, "Student file not found!")
+
+def saveStudents():
+    file_path = os.path.join(os.path.dirname(__file__), "studentMarks.txt")
+
+    try:
+        with open(file_path, "w") as file:
+            if header_line is not None:
+                if header_line.strip().isdigit():
+                    file.write(f"{len(students)}\n")
+                else:
+                    file.write(header_line if header_line.endswith("\n") else header_line + "\n")
+
+            for student in students:
+                line = f"{student[0]},{student[1]},{student[2]},{student[3]},{student[4]},{student[5]}\n"
+                file.write(line)
+        return True
+    except OSError:
+        messagebox.showerror("Error", "Could not save changes to studentMarks.txt.")
+        return False
 
 #This function will calculate the coursework mark out of 60!
 def courseworkMark(student):
@@ -148,6 +170,204 @@ def lowestStudent():
     output.insert(tk.END, "STUDENT WITH LOWEST MARK\n\n")
     output.insert(tk.END, displayStudent(lowest))
 
+def addStudent():
+    dialog = tk.Toplevel(root)
+    dialog.title("Add New Student")
+    dialog.geometry("320x340")
+    dialog.resizable(False, False)
+    dialog.configure(bg="#FCE4EC")
+    dialog.transient(root)
+    dialog.grab_set()
+
+    fields = [
+        ("Student Number:", ""),
+        ("Student Name:", ""),
+        ("Coursework 1 (0-20):", ""),
+        ("Coursework 2 (0-20):", ""),
+        ("Coursework 3 (0-20):", ""),
+        ("Exam Mark (0-100):", "")
+    ]
+    entries = []
+
+    for label_text, default_val in fields:
+        tk.Label(
+            dialog,
+            text=label_text,
+            font=("Arial", 9, "bold"),
+            bg="#FCE4EC",
+            fg="#8E4A59"
+        ).pack(pady=(6, 1))
+        entry = tk.Entry(dialog, font=("Arial", 10), width=26, bg="#FFFFFF", fg="#333333")
+        entry.insert(0, default_val)
+        entry.pack()
+        entries.append(entry)
+
+    def submit_new():
+        stu_num = entries[0].get().strip()
+        stu_name = entries[1].get().strip()
+
+        if not stu_num or not stu_name:
+            messagebox.showwarning("Missing Info", "Please enter both student number and name.", parent=dialog)
+            return
+
+        if any(s[0] == stu_num for s in students):
+            messagebox.showwarning("Duplicate ID", "A student with this number already exists.", parent=dialog)
+            return
+
+        try:
+            cw1 = int(entries[2].get().strip())
+            cw2 = int(entries[3].get().strip())
+            cw3 = int(entries[4].get().strip())
+            exam = int(entries[5].get().strip())
+        except ValueError:
+            messagebox.showwarning("Invalid Marks", "Marks must be whole numbers.", parent=dialog)
+            return
+
+        if not (0 <= cw1 <= 20 and 0 <= cw2 <= 20 and 0 <= cw3 <= 20 and 0 <= exam <= 100):
+            messagebox.showwarning("Out of Range", "Coursework marks must be 0-20 and exam mark 0-100.", parent=dialog)
+            return
+
+        new_student = [stu_num, stu_name, cw1, cw2, cw3, exam]
+        students.append(new_student)
+
+        if saveStudents():
+            output.delete("1.0", tk.END)
+            output.insert(tk.END, "New student added successfully!\n\n")
+            output.insert(tk.END, displayStudent(new_student))
+            dialog.destroy()
+
+    tk.Button(
+        dialog,
+        text="Save Student",
+        command=submit_new,
+        font=("Arial", 9, "bold"),
+        bg="#FFFFFF",
+        fg="#C76D7E",
+        relief="flat",
+        bd=1,
+        width=18
+    ).pack(pady=14)
+
+def editStudent():
+    if len(students) == 0:
+        output.delete("1.0", tk.END)
+        output.insert(tk.END, "No student records available to edit.")
+        return
+
+    query = search_entry.get().strip().lower()
+    target_index = None
+
+    if query:
+        for idx, student in enumerate(students):
+            if query == student[0].lower() or query == student[1].lower():
+                target_index = idx
+                break
+
+    dialog = tk.Toplevel(root)
+    dialog.title("Edit Student Record")
+    dialog.geometry("340x390")
+    dialog.resizable(False, False)
+    dialog.configure(bg="#FCE4EC")
+    dialog.transient(root)
+    dialog.grab_set()
+
+    tk.Label(
+        dialog,
+        text="Select Student:",
+        font=("Arial", 9, "bold"),
+        bg="#FCE4EC",
+        fg="#8E4A59"
+    ).pack(pady=(8, 2))
+
+    options = [f"{s[0]} - {s[1]}" for s in students]
+    selected_var = tk.StringVar(dialog)
+    initial_idx = target_index if target_index is not None else 0
+    selected_var.set(options[initial_idx])
+
+    selector = tk.OptionMenu(dialog, selected_var, *options)
+    selector.config(font=("Arial", 9), bg="#FFFFFF", fg="#333333", width=28)
+    selector.pack(pady=(0, 6))
+
+    labels = [
+        "Student Number:",
+        "Student Name:",
+        "Coursework 1 (0-20):",
+        "Coursework 2 (0-20):",
+        "Coursework 3 (0-20):",
+        "Exam Mark (0-100):"
+    ]
+    entries = []
+
+    for label_text in labels:
+        tk.Label(
+            dialog,
+            text=label_text,
+            font=("Arial", 9, "bold"),
+            bg="#FCE4EC",
+            fg="#8E4A59"
+        ).pack(pady=(4, 1))
+        entry = tk.Entry(dialog, font=("Arial", 10), width=26, bg="#FFFFFF", fg="#333333")
+        entry.pack()
+        entries.append(entry)
+
+    def populate_fields(*_):
+        choice = selected_var.get()
+        idx = options.index(choice)
+        rec = students[idx]
+        for entry, val in zip(entries, rec):
+            entry.delete(0, tk.END)
+            entry.insert(0, str(val))
+
+    selected_var.trace_add("write", populate_fields)
+    populate_fields()
+
+    def save_edit():
+        idx = options.index(selected_var.get())
+        stu_num = entries[0].get().strip()
+        stu_name = entries[1].get().strip()
+
+        if not stu_num or not stu_name:
+            messagebox.showwarning("Missing Info", "Please enter both student number and name.", parent=dialog)
+            return
+
+        if any(i != idx and s[0] == stu_num for i, s in enumerate(students)):
+            messagebox.showwarning("Duplicate ID", "Another student already uses this number.", parent=dialog)
+            return
+
+        try:
+            cw1 = int(entries[2].get().strip())
+            cw2 = int(entries[3].get().strip())
+            cw3 = int(entries[4].get().strip())
+            exam = int(entries[5].get().strip())
+        except ValueError:
+            messagebox.showwarning("Invalid Marks", "Marks must be whole numbers.", parent=dialog)
+            return
+
+        if not (0 <= cw1 <= 20 and 0 <= cw2 <= 20 and 0 <= cw3 <= 20 and 0 <= exam <= 100):
+            messagebox.showwarning("Out of Range", "Coursework marks must be 0-20 and exam mark 0-100.", parent=dialog)
+            return
+
+        updated_student = [stu_num, stu_name, cw1, cw2, cw3, exam]
+        students[idx] = updated_student
+
+        if saveStudents():
+            output.delete("1.0", tk.END)
+            output.insert(tk.END, "Student record updated successfully!\n\n")
+            output.insert(tk.END, displayStudent(updated_student))
+            dialog.destroy()
+
+    tk.Button(
+        dialog,
+        text="Update Record",
+        command=save_edit,
+        font=("Arial", 9, "bold"),
+        bg="#FFFFFF",
+        fg="#C76D7E",
+        relief="flat",
+        bd=1,
+        width=18
+    ).pack(pady=12)
+
 
 #This will create the main application window!
 root = tk.Tk()
@@ -171,7 +391,7 @@ canvas.pack(fill="both", expand=True)
 canvas.create_image(0, 0, anchor="nw", image=bg_photo)
 
 controls_frame = tk.Frame(root, bg="#FCE4EC")
-controls_frame.place(x=675, y=68, width=240, height=320)
+controls_frame.place(x=675, y=68, width=240, height=360)
 
 title_label = tk.Label(
     controls_frame,
@@ -217,6 +437,12 @@ tk.Button(controls_frame, text="Highest Overall Mark",
 
 tk.Button(controls_frame, text="Lowest Overall Mark",
           command=lowestStudent, **button_style).pack(pady=3)
+
+tk.Button(controls_frame, text="Add New Student",
+          command=addStudent, **button_style).pack(pady=3)
+
+tk.Button(controls_frame, text="Edit Student Record",
+          command=editStudent, **button_style).pack(pady=3)
 
 #This displays the results!
 output_frame = tk.Frame(root, bg="#FFFFFF")
