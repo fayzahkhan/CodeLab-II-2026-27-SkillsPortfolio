@@ -164,7 +164,7 @@ root.configure(bg="#FFF0F3")
 
 base_dir = Path(__file__).resolve().parent
 
-#Logo!
+#Logo! (AI used, I couldn't figure out why the logo wouldn't show up with the previous method.)
 icon_path = base_dir / "calculator.ico"
 if icon_path.exists():
     try:
