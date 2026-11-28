@@ -390,8 +390,28 @@ canvas = tk.Canvas(root, width=win_w, height=win_h, highlightthickness=0, bd=0)
 canvas.pack(fill="both", expand=True)
 canvas.create_image(0, 0, anchor="nw", image=bg_photo)
 
+panel_x, panel_y, panel_w, panel_h = 678, 72, 232, 275
+
 controls_frame = tk.Frame(root, bg="#FCE4EC")
-controls_frame.place(x=675, y=68, width=240, height=360)
+controls_frame.place(x=panel_x, y=panel_y, width=panel_w, height=panel_h)
+
+guide_box = canvas.create_rectangle(
+    panel_x,
+    panel_y,
+    panel_x + panel_w,
+    panel_y + panel_h,
+    outline="#D81B60",
+    width=2,
+    dash=(4, 2),
+    state="hidden"
+)
+
+def toggle_guide(_event=None):
+    current = canvas.itemcget(guide_box, "state")
+    canvas.itemconfigure(guide_box, state="normal" if current == "hidden" else "hidden")
+
+root.bind("<g>", toggle_guide)
+root.bind("<G>", toggle_guide)
 
 title_label = tk.Label(
     controls_frame,
