@@ -73,7 +73,7 @@ def totalMark(student):
 def percentage(student):
     return (totalMark(student) / 160) * 100
 
-#determines the student's grade!
+#This determines the student's grade!
 def getGrade(student):
     mark = percentage(student)
 
@@ -377,6 +377,7 @@ root.geometry(f"{win_w}x{win_h}")
 root.resizable(False, False)
 root.configure(bg="#FFD6E7")
 
+#Tkinter icon (this was a struggle and wasn't working, AI used for this part too)
 cut_path = os.path.join(os.path.dirname(__file__), "cut.png")
 cut_pil = Image.open(cut_path).resize((32, 32), Image.Resampling.LANCZOS)
 cut_icon = ImageTk.PhotoImage(cut_pil)
